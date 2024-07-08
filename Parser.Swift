@@ -85,12 +85,15 @@ struct YAMLParser {
             }
 
             switch tokens[index] {
+                // If the token is a scalar, return a scalar node
             case .scalar(let value):
                 index += 1
                 return .scalar(value)
+                // If the token is a dash, return a sequence node
             case .dash:
                 index += 1
                 var sequence: [YAMLNode] = []
+                // Parse all the nodes in the sequence
                 while index < tokens.count, tokens[index] != .newline, tokens[index] != .dedent {
                     if let node = parseNode() {
                         sequence.append(node)
@@ -105,9 +108,11 @@ struct YAMLParser {
             case .newline:
                 index += 1
                 return parseNode()
+                // If the token is an indent, return a mapping node
             case .indent:
                 index += 1
                 var mapping: [String: YAMLNode] = [:]
+                // Parse all the key-value pairs in the mapping
                 while index < tokens.count, tokens[index] != .dedent {
                     if case .scalar(let key) = tokens[index] {
                         index += 1
